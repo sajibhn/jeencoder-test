@@ -13,41 +13,50 @@ import {
   Label,
   Row,
   Button,
+  Alert,
 } from 'reactstrap';
 import one from '../../../assets/images/pro3/1.jpg';
 import user from '../../../assets/images/user.png';
 import MDEditor from '@uiw/react-md-editor';
 
 const Add_product = () => {
-  const [value, setValue] = useState('');
-  const [quantity, setQuantity] = useState(1);
   const [productImages, setProductImages] = useState([]);
   const [dummyimgs, setDummyimgs] = useState([{ img: user }]);
+  const [productName, setProductName] = useState('');
+  const [brandName, setBrandName] = useState('');
+  const [price, setPrice] = useState();
+  const [discount, setDiscount] = useState();
+  const [quantity, setQuantity] = useState();
+  const [type, setType] = useState('electronics');
+  const [category, setCategory] = useState('Electronics');
+  const [isNew, setIsNew] = useState(false);
+  const [isForSale, setIsForSale] = useState(false);
+  const [ratings, setRatings] = useState({ user: '', rating: '' });
+  const [reviews, setReviews] = useState({
+    user: '',
+    review: '',
+    createdAt: new Date(),
+  });
 
-  const onChange = (e) => {
-    setValue(e);
-  };
+  const [variant, setVariant] = useState({
+    color: {
+      color_name: '',
+      color_code: '',
+    },
+    id: '',
+    image_id: '',
+    size: {
+      size: '',
+      stock: '',
+    },
+    sku: '',
+  });
 
-  const IncrementItem = () => {
-    if (quantity < 9) {
-      setQuantity(quantity + 1);
-    } else {
-      return null;
-    }
-  };
-  const DecreaseItem = () => {
-    if (quantity > 0) {
-      setQuantity(quantity - 1);
-    } else {
-      return null;
-    }
-  };
-  const handleChange = (event) => {
-    setQuantity(event.target.value);
-  };
+  const [description, setDescription] = useState('');
+
+  const [productUploaded, setProductUploaded] = useState(false);
 
   //	image upload
-
   const _handleImgChange = async (e, i) => {
     e.preventDefault();
     const image = e.target.files[0];
@@ -65,12 +74,167 @@ const Add_product = () => {
       setDummyimgs(updatedDummyimgs);
       const newImage = { image_id, alt, src, id };
       setProductImages((prevImages) => [...prevImages, newImage]);
+      setVariant((prevVariant) => ({
+        ...prevVariant,
+        id: id,
+        image_id: image_id,
+      }));
     } catch (error) {
       console.error('Network error:', error);
     }
   };
 
-  const handleValidSubmit = () => {};
+  // convert to number
+  const convertToNumber = (value, fieldName) => {
+    if (fieldName === 'user' || fieldName === 'date') {
+      return value; // Return the value as is without converting to a number
+    }
+    const parsedValue = parseFloat(value);
+    return isNaN(parsedValue) ? value : parsedValue;
+  };
+
+  // handle name
+  const handleProductName = (e) => {
+    setProductName(e.target.value);
+  };
+
+  // handle brand name
+  const handleBrandName = (e) => {
+    setBrandName(e.target.value);
+  };
+
+  // handle price
+  const handlePrice = (e) => {
+    setPrice(parseFloat(e.target.value));
+  };
+
+  // handle discount
+  const handleDiscount = (e) => {
+    setDiscount(parseFloat(e.target.value));
+  };
+
+  // handle type
+  const handleType = (e) => {
+    setType(e.target.value);
+  };
+
+  // handle Quantity
+  const handleQuantity = (e) => {
+    setQuantity(parseFloat(e.target.value));
+  };
+
+  // handle Categoy
+  const handleCategory = (e) => {
+    setCategory(e.target.value);
+  };
+
+  // handle is new
+  const handleIsNew = (e) => {
+    const selectedOption = e.target.value;
+    const booleanValue = selectedOption === 'true';
+    setIsNew(booleanValue);
+  };
+
+  // handle is for sale
+  const handleIsForSale = (e) => {
+    const selectedOption = e.target.value;
+    const booleanValue = selectedOption === 'true';
+    setIsForSale(booleanValue);
+  };
+
+  // handle Ratings
+  const handleRatings = (e) => {
+    const { name, value } = e.target;
+    const newValue = convertToNumber(value, name);
+    setRatings((prev) => ({
+      ...prev,
+      [name]: newValue,
+    }));
+  };
+
+  // handle reviews
+  const handleReviews = (e) => {
+    const { name, value } = e.target;
+    const newValue = convertToNumber(value, name);
+    setReviews((prev) => ({
+      ...prev,
+      [name]: newValue,
+    }));
+  };
+
+  const handleVariant = (e) => {
+    const { name, value } = e.target;
+    const newValue = convertToNumber(value);
+
+    if (name.includes('color')) {
+      setVariant((prevState) => ({
+        ...prevState,
+        color: {
+          ...prevState.color,
+          [name.split('.')[1]]: newValue,
+        },
+      }));
+    } else if (name.includes('size')) {
+      setVariant((prevState) => ({
+        ...prevState,
+        size: {
+          ...prevState.size,
+          [name.split('.')[1]]: newValue,
+        },
+      }));
+    } else {
+      setVariant((prevState) => ({
+        ...prevState,
+        [name]: newValue,
+      }));
+    }
+  };
+
+  // handle description
+  const handleDescription = (desc) => {
+    setDescription(desc);
+  };
+
+  const handleValidSubmit = async (e) => {
+    e.preventDefault();
+
+    const ratingsArray = [];
+    ratingsArray.push(ratings);
+
+    const reviewsArray = [];
+    reviewsArray.push(reviews);
+
+    const variantArray = [];
+    variantArray.push(variant);
+
+    const product = {
+      name: productName,
+      brand: brandName,
+      description: description,
+      price: price,
+      discount: discount,
+      quantity: quantity,
+      type: type,
+      category: category,
+      new: isNew,
+      sale: isForSale,
+      images: productImages,
+      ratings: ratingsArray,
+      reviews: reviewsArray,
+      variants: variantArray,
+    };
+
+    try {
+      const { data } = await axios.post(
+        'http://localhost:9001/api/products',
+        product
+      );
+      console.log(data);
+      setProductUploaded(true);
+    } catch (e) {
+      console.log(e.message);
+    }
+  };
   return (
     <Fragment>
       <Breadcrumb title="Add Product" parent="Physical" />
@@ -138,6 +302,8 @@ const Add_product = () => {
                               name="product_name"
                               id="product_name"
                               type="text"
+                              value={productName}
+                              onChange={handleProductName}
                               required
                             />
                           </div>
@@ -156,6 +322,8 @@ const Add_product = () => {
                               name="brand_name"
                               id="brand_name"
                               type="text"
+                              value={brandName}
+                              onChange={handleBrandName}
                               required
                             />
                           </div>
@@ -171,6 +339,8 @@ const Add_product = () => {
                               name="price"
                               id="price"
                               type="number"
+                              value={price}
+                              onChange={handlePrice}
                               required
                             />
                           </div>
@@ -189,6 +359,8 @@ const Add_product = () => {
                               name="discount"
                               id="discount"
                               type="number"
+                              value={discount}
+                              onChange={handleDiscount}
                               required
                             />
                           </div>
@@ -210,6 +382,8 @@ const Add_product = () => {
                               name="quantity"
                               id="quantity"
                               type="number"
+                              value={quantity}
+                              onChange={handleQuantity}
                               required
                             />
                           </div>
@@ -224,19 +398,24 @@ const Add_product = () => {
                             Type :
                           </Label>
                           <div className="col-xl-8 col-sm-7">
-                            <select className="form-control digits" id="type">
-                              <option>electronics</option>
-                              <option>furniture</option>
-                              <option>jewellery</option>
-                              <option>fashion</option>
-                              <option>beauty</option>
-                              <option>tools</option>
-                              <option>shoes</option>
-                              <option>bags</option>
-                              <option>kids</option>
-                              <option>eyeware</option>
-                              <option>light</option>
-                              <option>all</option>
+                            <select
+                              className="form-control digits"
+                              id="type"
+                              value={type}
+                              onChange={handleType}
+                            >
+                              <option value="electronics">electronics</option>
+                              <option value="furniture">furniture</option>
+                              <option value="jewellery">jewellery</option>
+                              <option value="fashion">fashion</option>
+                              <option value="beauty">beauty</option>
+                              <option value="tools">tools</option>
+                              <option value="shoes">shoes</option>
+                              <option value="bags">bags</option>
+                              <option value="kids">kids</option>
+                              <option value="eyeware">eyeware</option>
+                              <option value="light">light</option>
+                              <option value="all">all</option>
                             </select>
                           </div>
                         </FormGroup>
@@ -251,12 +430,14 @@ const Add_product = () => {
                             <select
                               className="form-control digits"
                               id="category"
+                              value={category}
+                              onChange={handleCategory}
                             >
-                              <option>Electronics</option>
-                              <option>Clothing</option>
-                              <option>Home</option>
-                              <option>Beauty</option>
-                              <option>Books</option>
+                              <option value="Electronics">Electronics</option>
+                              <option value="Clothing">Clothing</option>
+                              <option value="Home">Home</option>
+                              <option value="Beauty">Beauty</option>
+                              <option value="Books">Books</option>
                             </select>
                           </div>
                         </FormGroup>
@@ -265,9 +446,14 @@ const Add_product = () => {
                             New :
                           </Label>
                           <div className="col-xl-8 col-sm-7">
-                            <select className="form-control digits" id="new">
-                              <option>False</option>
-                              <option>True</option>
+                            <select
+                              className="form-control digits"
+                              id="new"
+                              value={isNew}
+                              onChange={handleIsNew}
+                            >
+                              <option value="false">False</option>
+                              <option value="true">True</option>
                             </select>
                           </div>
                         </FormGroup>
@@ -277,9 +463,14 @@ const Add_product = () => {
                             Sale :
                           </Label>
                           <div className="col-xl-8 col-sm-7">
-                            <select className="form-control digits" id="sale">
-                              <option>False</option>
-                              <option>True</option>
+                            <select
+                              className="form-control digits"
+                              id="sale"
+                              value={isForSale}
+                              onChange={handleIsForSale}
+                            >
+                              <option value="false">False</option>
+                              <option value="true">True</option>
                             </select>
                           </div>
                         </FormGroup>
@@ -296,10 +487,12 @@ const Add_product = () => {
                               <div className="col-xl-6 col-sm-6">
                                 <Input
                                   className="form-control"
-                                  name="rating-user-id"
+                                  name="user"
                                   id="rating-user-id"
                                   type="text"
                                   placeholder="user id"
+                                  value={ratings.user}
+                                  onChange={handleRatings}
                                   required
                                 />
                               </div>
@@ -310,6 +503,8 @@ const Add_product = () => {
                                   id="rating"
                                   type="number"
                                   placeholder="rating"
+                                  value={ratings.rating}
+                                  onChange={handleRatings}
                                   required
                                 />
                               </div>
@@ -328,10 +523,12 @@ const Add_product = () => {
                               <div className="col-xl-6 col-sm-6">
                                 <Input
                                   className="form-control"
-                                  name="reviews-user-id"
+                                  name="user"
                                   id="reviews-user-id"
                                   type="text"
                                   placeholder="user id"
+                                  value={reviews.user}
+                                  onChange={handleReviews}
                                   required
                                 />
                               </div>
@@ -342,6 +539,8 @@ const Add_product = () => {
                                   id="review"
                                   type="text"
                                   placeholder="review"
+                                  value={reviews.review}
+                                  onChange={handleReviews}
                                   required
                                 />
                               </div>
@@ -351,6 +550,8 @@ const Add_product = () => {
                                   name="date"
                                   id="date"
                                   type="date"
+                                  value={reviews.date}
+                                  onChange={handleReviews}
                                   required
                                 />
                               </div>
@@ -358,7 +559,10 @@ const Add_product = () => {
                           </div>
                         </FormGroup>
                         <FormGroup className="form-group mb-3 row ">
-                          <Label className="col-xl-3 col-sm-4 mb-0">
+                          <Label
+                            className="col-xl-3 col-sm-4 mb-0"
+                            for="color-name"
+                          >
                             Variants :
                           </Label>
                           <div className="col-xl-8 col-sm-7">
@@ -366,9 +570,10 @@ const Add_product = () => {
                               <div className="col-xl-6 col-sm-6 mb-3">
                                 <Input
                                   className="form-control"
-                                  name="color-name"
-                                  id="color-name"
+                                  name="color.color_name"
                                   type="text"
+                                  value={variant.color.color_name}
+                                  onChange={handleVariant}
                                   placeholder="color name"
                                   required
                                 />
@@ -376,10 +581,12 @@ const Add_product = () => {
                               <div className="col-xl-6 col-sm-6 mb-3">
                                 <Input
                                   className="form-control mb-0"
-                                  name="color-code"
+                                  name="color.color_code"
                                   id="color-code"
-                                  type="number"
+                                  type="text"
                                   placeholder="color code"
+                                  value={variant.color.color_code}
+                                  onChange={handleVariant}
                                   required
                                 />
                               </div>
@@ -387,29 +594,34 @@ const Add_product = () => {
                               <div className="col-xl-6 col-sm-6 mb-3">
                                 <Input
                                   className="form-control"
-                                  name="size"
+                                  name="size.size"
                                   id="size"
                                   type="number"
                                   placeholder="size"
+                                  value={variant.size.size}
+                                  onChange={handleVariant}
                                   required
                                 />
                               </div>
                               <div className="col-xl-6 col-sm-6 mb-3">
                                 <Input
                                   className="form-control mb-0"
-                                  name="stock"
+                                  name="size.stock"
                                   id="stock"
                                   type="number"
                                   placeholder="stock"
+                                  value={variant.size.stock}
+                                  onChange={handleVariant}
                                   required
                                 />
                               </div>
                               <div className="col-xl-12 col-sm-12 mb-3">
                                 <Input
                                   className="form-control mb-0"
-                                  name="sku"
-                                  id="sku"
                                   type="text"
+                                  name="sku"
+                                  value={variant.sku}
+                                  onChange={handleVariant}
                                   placeholder="sku"
                                   required
                                 />
@@ -422,7 +634,10 @@ const Add_product = () => {
                             Add Description :
                           </Label>
                           <div className="col-xl-8 col-sm-7 description-sm">
-                            <MDEditor value={value} onChange={onChange} />
+                            <MDEditor
+                              value={description}
+                              onChange={handleDescription}
+                            />
                           </div>
                         </FormGroup>
                       </div>
@@ -434,6 +649,12 @@ const Add_product = () => {
                           Discard
                         </Button>
                       </div>
+
+                      {productUploaded && (
+                        <Alert color="success mt-3">
+                          This is a success alert — check it out!
+                        </Alert>
+                      )}
                     </Form>
                   </Col>
                 </Row>
