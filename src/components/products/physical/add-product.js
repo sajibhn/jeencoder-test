@@ -22,14 +22,7 @@ const Add_product = () => {
   const [value, setValue] = useState('');
   const [quantity, setQuantity] = useState(1);
   const [productImages, setProductImages] = useState([]);
-  const [dummyimgs, setDummyimgs] = useState([
-    { img: user },
-    { img: user },
-    { img: user },
-    { img: user },
-    { img: user },
-    { img: user },
-  ]);
+  const [dummyimgs, setDummyimgs] = useState([{ img: user }]);
 
   const onChange = (e) => {
     setValue(e);
@@ -96,7 +89,7 @@ const Add_product = () => {
                       <Row>
                         <Col xl="9 xl-50" sm="6 col-9">
                           <img
-                            src={one}
+                            src={productImages[0]?.src || one}
                             alt=""
                             className="img-fluid image_zoom_1 blur-up lazyloaded"
                           />
@@ -133,14 +126,17 @@ const Add_product = () => {
                     >
                       <div className="form form-label-center">
                         <FormGroup className="form-group mb-3 row">
-                          <Label className="col-xl-3 col-sm-4 mb-0">
+                          <Label
+                            className="col-xl-3 col-sm-4 mb-0"
+                            for="product_name"
+                          >
                             Product Name :
                           </Label>
                           <div className="col-xl-8 col-sm-7">
                             <Input
                               className="form-control"
                               name="product_name"
-                              id="validationCustom01"
+                              id="product_name"
                               type="text"
                               required
                             />
@@ -148,14 +144,32 @@ const Add_product = () => {
                           <div className="valid-feedback">Looks good!</div>
                         </FormGroup>
                         <FormGroup className="form-group mb-3 row">
-                          <Label className="col-xl-3 col-sm-4 mb-0">
+                          <Label
+                            className="col-xl-3 col-sm-4 mb-0"
+                            for="brand_name"
+                          >
+                            Brand Name :
+                          </Label>
+                          <div className="col-xl-8 col-sm-7">
+                            <Input
+                              className="form-control"
+                              name="brand_name"
+                              id="brand_name"
+                              type="text"
+                              required
+                            />
+                          </div>
+                          <div className="valid-feedback">Looks good!</div>
+                        </FormGroup>
+                        <FormGroup className="form-group mb-3 row">
+                          <Label className="col-xl-3 col-sm-4 mb-0" for="price">
                             Price :
                           </Label>
                           <div className="col-xl-8 col-sm-7">
                             <Input
                               className="form-control mb-0"
                               name="price"
-                              id="validationCustom02"
+                              id="price"
                               type="number"
                               required
                             />
@@ -163,14 +177,38 @@ const Add_product = () => {
                           <div className="valid-feedback">Looks good!</div>
                         </FormGroup>
                         <FormGroup className="form-group mb-3 row">
-                          <Label className="col-xl-3 col-sm-4 mb-0">
-                            Product Code :
+                          <Label
+                            className="col-xl-3 col-sm-4 mb-0"
+                            for="discount"
+                          >
+                            Discount :
                           </Label>
                           <div className="col-xl-8 col-sm-7">
                             <Input
                               className="form-control "
-                              name="product_code"
-                              id="validationCustomUsername"
+                              name="discount"
+                              id="discount"
+                              type="number"
+                              required
+                            />
+                          </div>
+                          <div className="invalid-feedback offset-sm-4 offset-xl-3">
+                            Please choose Valid Code.
+                          </div>
+                        </FormGroup>
+
+                        <FormGroup className="form-group mb-3 row">
+                          <Label
+                            className="col-xl-3 col-sm-4 mb-0"
+                            for="quantity"
+                          >
+                            Quantity :
+                          </Label>
+                          <div className="col-xl-8 col-sm-7">
+                            <Input
+                              className="form-control "
+                              name="quantity"
+                              id="quantity"
                               type="number"
                               required
                             />
@@ -182,59 +220,202 @@ const Add_product = () => {
                       </div>
                       <div className="form">
                         <FormGroup className="form-group mb-3 row">
-                          <Label className="col-xl-3 col-sm-4 mb-0">
-                            Select Size :
+                          <Label className="col-xl-3 col-sm-4 mb-0" for="type">
+                            Type :
                           </Label>
                           <div className="col-xl-8 col-sm-7">
-                            <select
-                              className="form-control digits"
-                              id="exampleFormControlSelect1"
-                            >
-                              <option>Small</option>
-                              <option>Medium</option>
-                              <option>Large</option>
-                              <option>Extra Large</option>
+                            <select className="form-control digits" id="type">
+                              <option>electronics</option>
+                              <option>furniture</option>
+                              <option>jewellery</option>
+                              <option>fashion</option>
+                              <option>beauty</option>
+                              <option>tools</option>
+                              <option>shoes</option>
+                              <option>bags</option>
+                              <option>kids</option>
+                              <option>eyeware</option>
+                              <option>light</option>
+                              <option>all</option>
                             </select>
                           </div>
                         </FormGroup>
                         <FormGroup className="form-group mb-3 row">
-                          <Label className="col-xl-3 col-sm-4 mb-0">
-                            Total Products :
+                          <Label
+                            className="col-xl-3 col-sm-4 mb-0"
+                            for="category"
+                          >
+                            Category :
                           </Label>
-                          <fieldset className="qty-box ms-0">
-                            <div className="input-group bootstrap-touchspin">
-                              <div className="input-group-prepend">
-                                <Button
-                                  className="btn btn-primary btn-square bootstrap-touchspin-down"
-                                  type="button"
-                                  onClick={DecreaseItem}
-                                >
-                                  <i className="fa fa-minus"></i>
-                                </Button>
+                          <div className="col-xl-8 col-sm-7">
+                            <select
+                              className="form-control digits"
+                              id="category"
+                            >
+                              <option>Electronics</option>
+                              <option>Clothing</option>
+                              <option>Home</option>
+                              <option>Beauty</option>
+                              <option>Books</option>
+                            </select>
+                          </div>
+                        </FormGroup>
+                        <FormGroup className="form-group mb-3 row">
+                          <Label className="col-xl-3 col-sm-4 mb-0" for="new">
+                            New :
+                          </Label>
+                          <div className="col-xl-8 col-sm-7">
+                            <select className="form-control digits" id="new">
+                              <option>False</option>
+                              <option>True</option>
+                            </select>
+                          </div>
+                        </FormGroup>
+
+                        <FormGroup className="form-group mb-3 row">
+                          <Label className="col-xl-3 col-sm-4 mb-0" for="sale">
+                            Sale :
+                          </Label>
+                          <div className="col-xl-8 col-sm-7">
+                            <select className="form-control digits" id="sale">
+                              <option>False</option>
+                              <option>True</option>
+                            </select>
+                          </div>
+                        </FormGroup>
+
+                        <FormGroup className="form-group mb-3 row">
+                          <Label
+                            className="col-xl-3 col-sm-4 mb-0"
+                            for="rating-user-id"
+                          >
+                            Ratings :
+                          </Label>
+                          <div className="col-xl-8 col-sm-7">
+                            <div className="row">
+                              <div className="col-xl-6 col-sm-6">
+                                <Input
+                                  className="form-control"
+                                  name="rating-user-id"
+                                  id="rating-user-id"
+                                  type="text"
+                                  placeholder="user id"
+                                  required
+                                />
                               </div>
-                              <div className="input-group-prepend">
-                                <span className="input-group-text bootstrap-touchspin-prefix"></span>
-                              </div>
-                              <Input
-                                className="touchspin form-control"
-                                type="text"
-                                value={quantity}
-                                onChange={handleChange}
-                              />
-                              <div className="input-group-append">
-                                <span className="input-group-text bootstrap-touchspin-postfix"></span>
-                              </div>
-                              <div className="input-group-append ms-0">
-                                <Button
-                                  className="btn btn-primary btn-square bootstrap-touchspin-up"
-                                  type="button"
-                                  onClick={IncrementItem}
-                                >
-                                  <i className="fa fa-plus"></i>
-                                </Button>
+                              <div className="col-xl-6 col-sm-6">
+                                <Input
+                                  className="form-control mb-0"
+                                  name="rating"
+                                  id="rating"
+                                  type="number"
+                                  placeholder="rating"
+                                  required
+                                />
                               </div>
                             </div>
-                          </fieldset>
+                          </div>
+                        </FormGroup>
+                        <FormGroup className="form-group mb-3 row">
+                          <Label
+                            className="col-xl-3 col-sm-4 mb-0"
+                            for="reviews-user-id"
+                          >
+                            Reviews :
+                          </Label>
+                          <div className="col-xl-8 col-sm-7">
+                            <div className="row">
+                              <div className="col-xl-6 col-sm-6">
+                                <Input
+                                  className="form-control"
+                                  name="reviews-user-id"
+                                  id="reviews-user-id"
+                                  type="text"
+                                  placeholder="user id"
+                                  required
+                                />
+                              </div>
+                              <div className="col-xl-6 col-sm-6">
+                                <Input
+                                  className="form-control mb-0"
+                                  name="review"
+                                  id="review"
+                                  type="text"
+                                  placeholder="review"
+                                  required
+                                />
+                              </div>
+                              <div className="col-xl-12 mt-3">
+                                <Input
+                                  className="form-control mb-0"
+                                  name="date"
+                                  id="date"
+                                  type="date"
+                                  required
+                                />
+                              </div>
+                            </div>
+                          </div>
+                        </FormGroup>
+                        <FormGroup className="form-group mb-3 row ">
+                          <Label className="col-xl-3 col-sm-4 mb-0">
+                            Variants :
+                          </Label>
+                          <div className="col-xl-8 col-sm-7">
+                            <div className="row">
+                              <div className="col-xl-6 col-sm-6 mb-3">
+                                <Input
+                                  className="form-control"
+                                  name="color-name"
+                                  id="color-name"
+                                  type="text"
+                                  placeholder="color name"
+                                  required
+                                />
+                              </div>
+                              <div className="col-xl-6 col-sm-6 mb-3">
+                                <Input
+                                  className="form-control mb-0"
+                                  name="color-code"
+                                  id="color-code"
+                                  type="number"
+                                  placeholder="color code"
+                                  required
+                                />
+                              </div>
+
+                              <div className="col-xl-6 col-sm-6 mb-3">
+                                <Input
+                                  className="form-control"
+                                  name="size"
+                                  id="size"
+                                  type="number"
+                                  placeholder="size"
+                                  required
+                                />
+                              </div>
+                              <div className="col-xl-6 col-sm-6 mb-3">
+                                <Input
+                                  className="form-control mb-0"
+                                  name="stock"
+                                  id="stock"
+                                  type="number"
+                                  placeholder="stock"
+                                  required
+                                />
+                              </div>
+                              <div className="col-xl-12 col-sm-12 mb-3">
+                                <Input
+                                  className="form-control mb-0"
+                                  name="sku"
+                                  id="sku"
+                                  type="text"
+                                  placeholder="sku"
+                                  required
+                                />
+                              </div>
+                            </div>
+                          </div>
                         </FormGroup>
                         <FormGroup className="form-group mb-3 row">
                           <Label className="col-xl-3 col-sm-4">
