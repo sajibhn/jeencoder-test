@@ -230,7 +230,9 @@ const Add_product = () => {
         product
       );
       console.log(data);
-      setProductUploaded(true);
+      if (data) {
+        setProductUploaded(true);
+      }
     } catch (e) {
       console.log(e.message);
     }
@@ -652,7 +654,7 @@ const Add_product = () => {
 
                       {productUploaded && (
                         <Alert color="success mt-3">
-                          This is a success alert — check it out!
+                          product uploaded successfully
                         </Alert>
                       )}
                     </Form>
